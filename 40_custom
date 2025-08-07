@@ -1,0 +1,82 @@
+#!/bin/sh
+exec tail -n +3 $0
+# This file provides an easy way to add custom menu entries.  Simply type the
+# menu entries you want to add after this comment.  Be careful not to change
+# the 'exec tail' line above.
+
+submenu 'Precompiled actions - Made by Fede' {
+  set menu_color_normal=green/black
+  set menu_color_highlight=light-green/black
+  menuentry 'Shutdown' {
+    halt
+  }
+
+  menuentry 'Reboot' {
+    reboot
+  }
+
+  menuentry 'CMOS actions' {
+	clear
+        echo -e "1. Clear bit in CMOS\n"
+        echo -e "2. Dump CMOS content\n"
+        echo -e "3. Test bit in CMOS\n"
+        read cmosOption
+
+        if [ "$cmosOption" = "1" ]; then
+          clear
+          echo -e "Write byte position\n"
+          read bytePosition
+          echo -e "Write bit position\n"
+          read bitPosition
+          echo -e "Clearing bit\n"
+          sleep 2
+          cmosclean "$bytePosition:$bitPosition"
+        else
+		if [ "$cmosOption" = "2" ]; then
+          		clear
+          		cmosdump
+       	 	else 
+			if [ "$cmosOption" = "3" ]; then
+				clear
+				echo -e "Write byte position\n"
+				read bytePosition
+     				echo -e "Write bit position\n"
+				read bitPosition
+				echo -e "Testing bit\n"
+				sleep 2
+				cmostest "$bytePosition:$bitPosition"
+       		 	fi
+		fi
+	fi
+	read -p "Press enter to continue"
+
+  }
+  menuentry 'CPU actions' {
+	clear
+        echo -e "1. Check CPU features\n"
+        read cpuOpt
+
+        if [ "$cpuOpt" = "1" ]; then
+		clear
+		cpuid
+          	if cpuid -l; then
+			echo -e "The CPU supports long mode (64-bit)\n"
+          	fi
+          	if cpuid -p; then
+			echo -e "The CPU supports Physical Address Extension (PAE)\n"
+          	fi
+        fi
+	read -p "Press enter to continue"
+  }
+  menuentry 'GPU actions' {
+	clear
+        echo -e "1. List available video modes\n"
+        read gpuOpt
+
+        if [ $gpuOpt = 1 ]; then
+		clear
+		videoinfo
+	fi
+	read -p "Press enter to continue"
+  }
+}
